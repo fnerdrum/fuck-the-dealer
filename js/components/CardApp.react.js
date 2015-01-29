@@ -2,16 +2,17 @@ var React = require('react');
 var CardStore = require('../stores/CardStore');
 var CardRank = require('./CardRank.react');
 
-function getCardState() {
+function getState() {
     return {
-        cards: CardStore.getCards()
+        cards: CardStore.getCards(),
+        strategy: CardStore.getStrategy()
     };
 }
 
 var CardApp = React.createClass({
 
     getInitialState: function() {
-        return getCardState();
+        return getState();
     },
 
     componentDidMount: function () {
@@ -24,16 +25,17 @@ var CardApp = React.createClass({
 
     render: function () {
         var cardViews = [];
+        var strategy = this.state.strategy;
         for (var i = 0; i < this.state.cards.length; i++) {
             var card = this.state.cards[i];
-            cardViews.push(<CardRank key={card.value} name={card.name} count={card.count} />);
+            cardViews.push(<CardRank key={card.value} card={card} strategy={strategy}/>);
         }
         return (
             <div className='fuck-the-dealer-app'>{cardViews}</div>);
     },
 
     _onChange: function () {
-        this.setState(getCardState());
+        this.setState(getState());
     }
 
 });

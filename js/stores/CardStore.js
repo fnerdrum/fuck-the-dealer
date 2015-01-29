@@ -3,7 +3,11 @@ var EventEmitter = require('events').EventEmitter;
 var Constants = require('../constants/Constants');
 var _ = require('underscore');
 
-var _cards = _.range(2, 15).map(function (n) {
+const firstCard = 2;
+const lastCard = 14;
+
+var cardRange = _.range(firstCard, lastCard + 1);
+var cards = cardRange.map(function (n) {
 
     function displayName(cardValue) {
         if (cardValue === 14) {
@@ -27,15 +31,32 @@ var _cards = _.range(2, 15).map(function (n) {
         count: 4
     }
 });
+var allStrategies = _.reduce(cardRange, function (acc, n) {
+    for (var lower = firstCard; lower <= n; lower++) {
+        for (var higher = n; higher <= lastCard; higher++) {
+            acc.push({low: lower, middle: n, high: higher});
+        }
+    }
+    return acc;
+}, []);
+var strategy = findOptimalStrategy(cards);
 
 function pickCard(card) {
-    _.findWhere(_cards, card).count--;
+    _.findWhere(cards, card).count--;
+}
+
+function findOptimalStrategy(cards) {
+    return {low: 3, middle: 7, high: 10};
 }
 
 var CardStore = _.extend({}, EventEmitter.prototype, {
 
     getCards: function() {
-        return _cards;
+        return cards;
+    },
+
+    getStrategy: function() {
+        return strategy;
     },
 
     emitChange: function() {

@@ -24,3 +24,15 @@
 .card > p {
     margin: 0;
 }
+
+.low {
+    border: 2px solid green;
+}
+
+.middle {
+    border: 2px solid red;
+}
+
+.high {
+    border: 2px solid orange;
+}
