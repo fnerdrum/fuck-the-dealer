@@ -8,10 +8,10 @@ var Actions = {
             card: card
         })
     },
-    changeAggressivity: function(aggressivity) {
+    changeAggressiveness: function(aggressiveness) {
         AppDispatcher.handleAction({
             actionType: Constants.CHANGE_AGGRESSIVITY,
-            aggressivity: aggressivity
+            aggressiveness: aggressiveness
         })
     }
 };

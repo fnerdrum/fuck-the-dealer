@@ -3,14 +3,15 @@ var EventEmitter = require('events').EventEmitter;
 var Constants = require('../constants/Constants');
 var _ = require('underscore');
 
-const firstCard = 2;
-const lastCard = 14;
+const firstCard = 1;
+const lastCard = 13;
 
+var aggressiveness = 50;
 var cardRange = _.range(firstCard, lastCard + 1);
 var cards = cardRange.map(function (n) {
 
     function displayName(cardValue) {
-        if (cardValue === 14) {
+        if (cardValue === 1) {
             return 'A'
         }
         if (cardValue === 13) {
@@ -39,14 +40,24 @@ var allStrategies = _.reduce(cardRange, function (acc, n) {
     }
     return acc;
 }, []);
-var strategy = findOptimalStrategy(cards);
+var strategy = findOptimalStrategy();
 
 function pickCard(card) {
     _.findWhere(cards, card).count--;
 }
 
-function findOptimalStrategy(cards) {
-    return {low: 3, middle: 7, high: 10};
+function findOptimalStrategy() {
+    if (aggressiveness < 50) {
+        return {low: 3, middle: 7, high: 10};
+    }
+    else {
+        return {low: 4, middle: 8, high: 11};
+    }
+}
+
+function changeAggressiveness(aggr) {
+    aggressiveness = aggr;
+    strategy = findOptimalStrategy()
 }
 
 var CardStore = _.extend({}, EventEmitter.prototype, {
@@ -57,6 +68,10 @@ var CardStore = _.extend({}, EventEmitter.prototype, {
 
     getStrategy: function() {
         return strategy;
+    },
+
+    getAggressiveness: function() {
+        return aggressiveness;
     },
 
     emitChange: function() {
@@ -78,6 +93,9 @@ AppDispatcher.register(function(payload) {
     switch (action.actionType) {
         case Constants.PICK_CARD:
             pickCard(action.card);
+            break;
+        case Constants.CHANGE_AGGRESSIVITY:
+            changeAggressiveness(action.aggressiveness);
             break;
         default:
             return true;
