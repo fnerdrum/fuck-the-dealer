@@ -38,7 +38,7 @@ var CardApp = React.createClass({
             <div className='fuck-the-dealer-app'>
                 <div className='cards'>{cardViews}</div>
                 <input type="range" min="0" max="100" id="aggressiveness" onChange={this.changeAggressiveness}/>
-                <label htmlFor="aggressiveness">{this.state.aggressiveness}%</label>
+                <label htmlFor="aggressiveness">{Math.round(this.state.aggressiveness)}%</label>
             </div>);
     },
 

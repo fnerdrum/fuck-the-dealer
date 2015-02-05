@@ -32,6 +32,7 @@ var cards = cardRange.map(function (n) {
         count: 4
     }
 });
+
 var allStrategies = _.reduce(cardRange, function (acc, n) {
     for (var lower = firstCard; lower <= n; lower++) {
         for (var higher = n; higher <= lastCard; higher++) {
@@ -44,50 +45,88 @@ var strategy = findOptimalStrategy();
 
 function pickCard(card) {
     _.findWhere(cards, card).count--;
+    strategy = findOptimalStrategy();
 }
 
 function findOptimalStrategy() {
-    if (aggressiveness < 50) {
-        return {low: 3, middle: 7, high: 10};
-    }
-    else {
-        return {low: 4, middle: 8, high: 11};
-    }
+    var remaining = remaingCards();
+    return _.max(allStrategies, function (strategy) {
+        var countMiddle = getCount(strategy.middle);
+        var countLower = getCount(strategy.low);
+        var countHigher = getCount(strategy.high);
+
+        return expectedPlayerDrinks(remaining, countMiddle, countLower, countHigher) * aggressiveness
+            + expectedDealerDrinks(strategy, remaining, countMiddle, countLower, countHigher) * (100 - aggressiveness);
+    })
+}
+
+function findCard(cardValue) {
+    return _.find(cards, function (c) {
+        return c.value === cardValue;
+    });
+}
+
+function getCount(cardValue) {
+    return findCard(cardValue).count;
+}
+
+function remaingCards() {
+    return _.reduce(cards, function (acc, c) {
+        return acc + c.count;
+    }, 0);
+}
+
+function expectedPlayerDrinks(remaining, countMiddle, countLower, countHigher) {
+    return 0;
+}
+
+function expectedDealerDrinks(strategy, remaining, countMiddle, countLower, countHigher) {
+    var expectedMiddle = 10 * (countMiddle / remaining);
+    var expectedLower = strategy.low < strategy.middle ? 5 * (countLower / remaining) : 0;
+    var expectedHigher = strategy.high > strategy.middle ? 5 * (countHigher / remaining) : 0;
+
+    return expectedMiddle + expectedLower + expectedHigher;
 }
 
 function changeAggressiveness(aggr) {
-    aggressiveness = aggr;
+    if (aggr == 0) {
+        aggressiveness = 0.0001;
+    } else if (aggr == 100) {
+        aggressiveness = 99.9999;
+    } else {
+        aggressiveness = aggr;
+    }
     strategy = findOptimalStrategy()
 }
 
 var CardStore = _.extend({}, EventEmitter.prototype, {
 
-    getCards: function() {
+    getCards: function () {
         return cards;
     },
 
-    getStrategy: function() {
+    getStrategy: function () {
         return strategy;
     },
 
-    getAggressiveness: function() {
+    getAggressiveness: function () {
         return aggressiveness;
     },
 
-    emitChange: function() {
+    emitChange: function () {
         this.emit('change');
     },
 
-    addChangeListener: function(callback) {
+    addChangeListener: function (callback) {
         this.on('change', callback);
     },
 
-    removeChangeListener: function(callback) {
+    removeChangeListener: function (callback) {
         this.removeListener('change', callback);
     }
 });
 
-AppDispatcher.register(function(payload) {
+AppDispatcher.register(function (payload) {
     var action = payload.action;
 
     switch (action.actionType) {
