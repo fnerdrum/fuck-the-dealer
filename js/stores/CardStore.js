@@ -79,9 +79,9 @@ function remaingCards() {
 function expectedPlayerDrinks(strategy, remaining) {
     return _.reduce(cards
         .filter(function (c) {
-            return c.value != strategy.middle.value
-                && c.value != strategy.low.value
-                && c.value != strategy.high.value;
+            return c.value != strategy.middle
+                && c.value != strategy.low
+                && c.value != strategy.high;
         })
         .map(function (c) {
 
