@@ -55,8 +55,8 @@ function findOptimalStrategy() {
         var countLower = getCount(strategy.low);
         var countHigher = getCount(strategy.high);
 
-        return expectedPlayerDrinks(remaining, countMiddle, countLower, countHigher) * aggressiveness
-            + expectedDealerDrinks(strategy, remaining, countMiddle, countLower, countHigher) * (100 - aggressiveness);
+        return ((11 - expectedPlayerDrinks(strategy, remaining, countMiddle)) / 11) * (100 - aggressiveness)
+            + (expectedDealerDrinks(strategy, remaining, countMiddle, countLower, countHigher) / 10) * aggressiveness;
     })
 }
 
@@ -76,8 +76,23 @@ function remaingCards() {
     }, 0);
 }
 
-function expectedPlayerDrinks(remaining, countMiddle, countLower, countHigher) {
-    return 0;
+function expectedPlayerDrinks(strategy, remaining) {
+    return _.reduce(cards
+        .filter(function (c) {
+            return c.value != strategy.middle.value
+                && c.value != strategy.low.value
+                && c.value != strategy.high.value;
+        })
+        .map(function (c) {
+
+            if (c.value < strategy.middle) {
+                return (c.count / remaining) * Math.abs(c.value - strategy.low);
+            } else {
+                return (c.count / remaining) * Math.abs(c.value - strategy.high);
+            }
+        }), function (acc, n) {
+        return acc + n;
+    }, 0);
 }
 
 function expectedDealerDrinks(strategy, remaining, countMiddle, countLower, countHigher) {
